@@ -31,9 +31,8 @@ clean_df = clean_df[(clean_df["Breite"] >= -90) & (clean_df["Breite"] <= 90)]
 clean_df = clean_df[clean_df["IFOPT"].notnull()]
 clean_df = clean_df[clean_df["Betreiber_Name"].notnull()]
 clean_df = clean_df[clean_df["Betreiber_Nr"].notnull()]
+clean_df["Betreiber_Nr"] = clean_df["Betreiber_Nr"].astype("int64")
 clean_df[["char", "num1", "num2", "num3"]] = clean_df["IFOPT"].str.split(":", expand=True)
-
-# TODO : drop Betreiber_Nr = null?
 
 mask = (clean_df["char"].str.len() == 2) & \
        (clean_df["num1"].str.isnumeric()) & \
@@ -41,7 +40,7 @@ mask = (clean_df["char"].str.len() == 2) & \
 
 clean_df = clean_df[mask]
 clean_df = clean_df.drop(["char", "num1", "num2", "num3"], axis=1)
-print(clean_df.isna().sum())
+clean_df = clean_df[clean_df["Betreiber_Nr"].notnull()]
 print(clean_df.head())
 print(clean_df.info())
 
