@@ -22,30 +22,15 @@ url = "https://download-data.deutschebahn.com/static/datasets/haltestellen/D_Bah
 df = pd.read_csv(url, delimiter=";", thousands=".", decimal=",")
 
 df = df.drop("Status", axis=1)
-print(df.head())
-print(df.info())
-
-# print(df.groupby("Verkehr").agg({"Verkehr":"count"}))
-print(df.shape)
 valid_verkehr_list = ["FV", "RV", "nur DPN"]
 clean_df = df[df["Verkehr"].isin(valid_verkehr_list)]
-# print(clean_df.groupby("Verkehr").agg({"Verkehr":"count"}))
-print(clean_df.shape)
-
-print(max(clean_df["Laenge"]))
-print(min(clean_df["Laenge"]))
-print(max(clean_df["Breite"]))
-print(min(clean_df["Breite"]))
 
 clean_df = clean_df[(clean_df["Laenge"] >= -90) & (clean_df["Laenge"] <= 90)]
 clean_df = clean_df[(clean_df["Breite"] >= -90) & (clean_df["Breite"] <= 90)]
 
-print(max(clean_df["Laenge"]))
-print(min(clean_df["Laenge"]))
-print(max(clean_df["Breite"]))
-print(min(clean_df["Breite"]))
-
 clean_df = clean_df[clean_df["IFOPT"].notnull()]
+clean_df = clean_df[clean_df["Betreiber_Name"].notnull()]
+clean_df = clean_df[clean_df["Betreiber_Nr"].notnull()]
 clean_df[["char", "num1", "num2", "num3"]] = clean_df["IFOPT"].str.split(":", expand=True)
 
 # TODO : drop Betreiber_Nr = null?
@@ -56,22 +41,10 @@ mask = (clean_df["char"].str.len() == 2) & \
 
 clean_df = clean_df[mask]
 clean_df = clean_df.drop(["char", "num1", "num2", "num3"], axis=1)
-
-print(clean_df.info())
+print(clean_df.isna().sum())
 print(clean_df.head())
+print(clean_df.info())
 
-# db_path = "/data/trainstops.sqlite"
-# engine = create_engine(f"sqlite:///{db_path}")
-# clean_df.to_sql('trainstops', engine, index=False, if_exists='replace')
-# engine.dispose()
-
-# db_path = '/data/your_database_name.db'
-#
-# # Create a SQLAlchemy engine with the specified database path
-# engine = create_engine(f'sqlite:///{db_path}')
 engine = create_engine('sqlite:///trainstops.sqlite')
-# Write the DataFrame to a table in the SQLite database
 clean_df.to_sql('trainstops', engine, index=False, if_exists='replace')
-
-# Optionally, close the engine
 engine.dispose()
