@@ -2,30 +2,33 @@
 
 ## Title
 <!-- Give your project a short title. -->
-COVID-19 and Baby Boom in Germany
+Gender Inequality: Graduation Field and Wage Gap
 
 ## Main Question
 
 <!-- Think about one main question you want to answer based on the data. -->
-1. Is the rumour of "COVID Baby Boom" true?
+Could the graduation fields play a role in closing the gender wage gap?
 
 ## Description
 
 <!-- Describe your data science project in max. 200 words. Consider writing about why and how you attempt it. -->
-COVID-19 changed our life-styles dramatically. Due to lockdowns, new working styles were implemented and people who used to work in the office spend more time with their life partners at home. On one hand, someone argues that this contributes to higher divorce rate, but on the other hand there are also rumours about baby boom due to the COVID-19.
-
-Since there is no comprehensive study/survey collecting actual number of home-office in Germany before and after COVID, this project would aim to compare number of confirmed cases of COVID-19 and the number of newborn babies in Germany to figure out if there is any interesting insight.
+Ever since women joined the work forces, gender inequality in terms of wage gap has long been a phenomenon even in most developed economies. 
+In the old days, due to low literacy rate and physical limitation, participation in less job roles might contribution greatly to inequality in working environment.
+While technology evolves and social norm changes, women are given more chances into different fields. Could this actually close the gender wage gap?
 
 ## Datasources
 
 <!-- Describe each datasources you plan to use in a section. Use the prefic "DatasourceX" where X is the id of the datasource. -->
 
-### Datasource1: ExampleSource
-* Statistisches Bundesamt URL: https://www-genesis.destatis.de/
-* worldometer URL: https://www.worldometers.info/coronavirus/country/germany/
-* Data Type: CSV
+### World Bank: Gender Data Portal
+* Metadata: https://genderdata.worldbank.org/indicators/
+* Dataset URL : https://databank.worldbank.org/data/download/Gender_Stats_CSV.zip
+* Data Type: ZIP/CSV
 
-The data in Genesis (Table 12612-0002: Live births: Germany, months, sex) and the number of COVID-19 confirmed cases from worldometer will be used.
+### OECD: Gender Wage Gap
+* Metadata : https://data.oecd.org/earnwage/gender-wage-gap.htm
+* Dataset URL : https://stats.oecd.org/sdmx-json/data/DP_LIVE/.WAGEGAP.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en
+* Data Type: CSV
 
 ## Work Packages
 
