@@ -38,13 +38,23 @@ print(worldbank_df.shape)
 #print(worldbank_df.info())
 
 select_indicator_list = worldbank_df[worldbank_df["Indicator Name"].str.contains("share of graduates")]["Indicator Name"].unique().tolist()
-worldbank_graduate_df = worldbank_df[worldbank_df["Indicator Name"].isin(select_indicator_list)]
-print(worldbank_graduate_df.shape)
-print(worldbank_graduate_df.head())
+graduate_df = worldbank_df[worldbank_df["Indicator Name"].isin(select_indicator_list)]
+graduate_df = graduate_df.loc[:, ~graduate_df.columns.str.contains('^Unnamed')]
+
+# last_updated_year = int(graduate_df.columns[-1])
+# print(last_updated_year)
+#
+# # graduate_df['Check Empty Row'] = graduate_df.iloc[:, -4:-1].sum(axis=1)
+#
+
+
+
+
+
 
 graduate_db_path = '../data/graduate_field.sqlite'
 engine = create_engine(f'sqlite:///{graduate_db_path}')
-worldbank_graduate_df.to_sql('graduate_field', engine, index=False, if_exists='replace')
+graduate_df.to_sql('graduate_field', engine, index=False, if_exists='replace')
 
 
 #############################################################
@@ -56,7 +66,7 @@ oecd_df = oecd_df.drop(["MEASURE", "FREQUENCY", "Flag Codes"], axis=1)
 
 wage_gap_db_path = '../data/wage_gap.sqlite'
 engine = create_engine(f'sqlite:///{wage_gap_db_path}')
-worldbank_graduate_df.to_sql('wage_gap', engine, index=False, if_exists='replace')
+oecd_df.to_sql('wage_gap', engine, index=False, if_exists='replace')
 
 """
 df = pd.read_csv(url, delimiter=";", thousands=".", decimal=",")
