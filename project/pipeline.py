@@ -11,6 +11,8 @@ pd.set_option('display.max_columns', 10)
 worldbank_zip_url = "https://databank.worldbank.org/data/download/Gender_Stats_CSV.zip"
 oecd_csv_url = "https://stats.oecd.org/sdmx-json/data/DP_LIVE/.WAGEGAP.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en"
 
+save_data_to_sql = True
+
 #############################################################
 ### World Bank: zip file
 #############################################################
@@ -33,28 +35,42 @@ if response.status_code == 200:
             worldbank_df = pd.read_csv(file)
 
 
-# Get to know data
-print(worldbank_df.shape)
-#print(worldbank_df.info())
-
 select_indicator_list = worldbank_df[worldbank_df["Indicator Name"].str.contains("share of graduates")]["Indicator Name"].unique().tolist()
 graduate_df = worldbank_df[worldbank_df["Indicator Name"].isin(select_indicator_list)]
 graduate_df = graduate_df.loc[:, ~graduate_df.columns.str.contains('^Unnamed')]
 
-# last_updated_year = int(graduate_df.columns[-1])
-# print(last_updated_year)
-#
-# # graduate_df['Check Empty Row'] = graduate_df.iloc[:, -4:-1].sum(axis=1)
-#
+print(graduate_df.info())
+
+############################ Data Transformation ########################################
+graduate_df['Check Empty Row'] = graduate_df.iloc[:, 5:-1].sum(axis=1)
+print(graduate_df['Check Empty Row'])
+print(graduate_df.shape)
+graduate_df = graduate_df[graduate_df['Check Empty Row'] != 0]
+graduate_df = graduate_df.drop('Check Empty Row', axis=1)
+print(graduate_df.shape)
 
 
+# Melting with column names
+unpivot_keep_col = graduate_df.columns[0:4]
+unpivot_melt_col = graduate_df.columns[5:-1]
+graduate_df = graduate_df.melt(id_vars=unpivot_keep_col,
+                               value_vars=unpivot_melt_col,
+                               var_name=['Year'], value_name='Female Share')
+
+graduate_df = graduate_df[graduate_df["Female Share"].notnull()]
+graduate_df['Graduation Field'] = graduate_df["Indicator Name"].str.extract(r'(?:from|in) (.*?) (?:programmes|fields,)')
+graduate_df = graduate_df.drop(["Indicator Code", "Indicator Name"], axis=1)
+graduate_df = graduate_df[["Country Code", "Country Name", "Graduation Field", "Year", "Female Share"]]
+print(graduate_df.head())
 
 
+################################Safe data####################################
 
+db_path = '../data/project.sqlite'
+engine = create_engine(f'sqlite:///{db_path}')
 
-graduate_db_path = '../data/graduate_field.sqlite'
-engine = create_engine(f'sqlite:///{graduate_db_path}')
-graduate_df.to_sql('graduate_field', engine, index=False, if_exists='replace')
+if save_data_to_sql:
+    graduate_df.to_sql('graduate_field', engine, index=False, if_exists='replace')
 
 
 #############################################################
@@ -62,11 +78,12 @@ graduate_df.to_sql('graduate_field', engine, index=False, if_exists='replace')
 #############################################################
 
 oecd_df = pd.read_csv(oecd_csv_url)
-oecd_df = oecd_df.drop(["MEASURE", "FREQUENCY", "Flag Codes"], axis=1)
+oecd_df = oecd_df.drop(["MEASURE", "FREQUENCY", "Flag Codes", "INDICATOR"], axis=1)
+print(oecd_df.head())
 
-wage_gap_db_path = '../data/wage_gap.sqlite'
-engine = create_engine(f'sqlite:///{wage_gap_db_path}')
-oecd_df.to_sql('wage_gap', engine, index=False, if_exists='replace')
+
+if save_data_to_sql:
+    oecd_df.to_sql('wage_gap', engine, index=False, if_exists='replace')
 
 """
 df = pd.read_csv(url, delimiter=";", thousands=".", decimal=",")
