@@ -3,6 +3,5 @@
 !/data/.gitkeep
 .idea
 playground
-airports.sqlite
 trainstops.sqlite
-test.py
+2nd_transformation.py

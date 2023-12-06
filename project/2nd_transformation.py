@@ -1,7 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-
 pd.set_option('display.max_columns', 10)
 db_path = '../data/project.sqlite'
 engine = create_engine(f'sqlite:///{db_path}')
