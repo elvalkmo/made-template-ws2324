@@ -1,0 +1,78 @@
+// MADE Exercise3
+
+pipeline DataPipeline {
+
+	pipe {
+		from: CarsExtractor;
+		to: CarsTextFileInterpreter;
+	}
+
+	CarsTextFileInterpreter 
+		-> CarsCSVInterpreter
+		-> CarsDataSelector
+		-> CarsColumnDeleter
+		-> HeaderSequenceWriter
+	   	-> CarsTableInterpreter
+		-> CarsLoader;
+
+	block CarsExtractor oftype HttpExtractor {
+		url: "https://www-genesis.destatis.de/genesis/downloads/00/tables/46251-0021_00.csv";
+	}
+
+	block CarsTextFileInterpreter oftype TextFileInterpreter {
+		encoding: "utf8";
+	}
+
+	block CarsCSVInterpreter oftype CSVInterpreter {
+    	delimiter: ';';
+		enclosing: '"';
+	}
+
+	block CarsDataSelector oftype CellRangeSelector {
+   		select: range A7:BU483;
+ 	}
+	block CarsColumnDeleter oftype ColumnDeleter {
+		delete: [
+			column D, column E, column F, column G, column H, column I, 
+			column J, column K, column L, column N, column O, column P, 
+			column Q, column R, column S, column T, column U, column V, 
+			column X, column Y, column Z, column AA, column AB, column AC, 
+			column AD, column AE, column AF, column AH, column AI, column AJ, 
+			column AK, column AL, column AM, column AN, column AO, column AP, 
+			column AR, column AS, column AT, column AU, column AV, column AW, 
+			column AX, column AY, column AZ, column BB, column BC, column BD, 
+			column BE, column BF, column BG, column BH, column BI, column BJ, 
+			column BL, column BM, column BN, column BO, column BP, column BQ, 
+			column BR, column BS, column BT
+			];
+	}
+
+	block HeaderSequenceWriter oftype CellWriter {
+		at: range A1:J1;
+		write: [
+			"date", "CIN", "name", "petrol", "diesel", 
+			"gas", "electro", "hybrid", "plugInHybrid", "others"
+		];
+	}
+	
+	block CarsTableInterpreter oftype TableInterpreter {
+		header: true;
+		columns: [
+			"date" oftype text,
+			"CIN" oftype text,
+			"name" oftype text,
+			"petrol" oftype integer,
+			"diesel" oftype integer,
+			"gas" oftype integer,
+			"electro" oftype integer,
+			"hybrid" oftype integer,
+			"plugInHybrid" oftype integer,
+			"others" oftype integer
+		];
+	}
+
+	block CarsLoader oftype SQLiteLoader {
+		table: "Cars";
+		file: "./cars.sqlite";
+	}
+}
