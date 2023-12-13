@@ -59,15 +59,15 @@ pipeline DataPipeline {
 		header: true;
 		columns: [
 			"date" oftype text,
-			"CIN" oftype text,
+			"CIN" oftype KeyWith5Char,
 			"name" oftype text,
-			"petrol" oftype integer,
-			"diesel" oftype integer,
-			"gas" oftype integer,
-			"electro" oftype integer,
-			"hybrid" oftype integer,
-			"plugInHybrid" oftype integer,
-			"others" oftype integer
+			"petrol" oftype PosInt,
+			"diesel" oftype PosInt,
+			"gas" oftype PosInt,
+			"electro" oftype PosInt,
+			"hybrid" oftype PosInt,
+			"plugInHybrid" oftype PosInt,
+			"others" oftype PosInt
 		];
 	}
 
@@ -76,3 +76,25 @@ pipeline DataPipeline {
 		file: "./cars.sqlite";
 	}
 }
+
+valuetype KeyWith5Char oftype text {
+    constraints: [
+        AllDigits,
+        ExactlyFiveCharacters,
+    ];
+}
+
+constraint AllDigits on text:
+    value matches /^[0-9]*$/;
+
+constraint ExactlyFiveCharacters on text:
+    value.length == 5;
+
+valuetype PosInt oftype integer {
+    constraints: [
+        OnlyPositiveInteger,
+    ];
+}
+
+constraint OnlyPositiveInteger on integer:
+    value>0;
