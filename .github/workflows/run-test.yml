@@ -33,6 +33,13 @@ jobs:
       with:
         python-version: 3.11
 
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        cd main
+        pip install --upgrade pip
+        pip install -r project/requirements.txt
+
     # Run tests
     - name: Run Test
       run: |
