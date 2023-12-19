@@ -38,11 +38,11 @@ jobs:
       run: |
         cd main
         pip install --upgrade pip
-        pip install -r project/requirements.txt
+        pip install -r project/requirement.txt
 
     # Run tests
     - name: Run Test
       run: |
-        cd main
-        chmod +x project/tests.sh
-        project/tests.sh
+        cd main/project
+        chmod +x tests.sh
+        ./tests.sh

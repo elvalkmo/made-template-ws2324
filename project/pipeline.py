@@ -85,7 +85,7 @@ print(oecd_df.head())
 if save_data_to_sql:
     oecd_df.to_sql('wage_gap', engine, index=False, if_exists='replace')
 
-# test
+# test 2
 
 """
 df = pd.read_csv(url, delimiter=";", thousands=".", decimal=",")
