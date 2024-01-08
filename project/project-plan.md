@@ -2,7 +2,7 @@
 
 ## Title
 <!-- Give your project a short title. -->
-Gender Inequality: Graduation Field and Wage Gap
+Gender Inequality: Relationship between Graduation Field and Wage Gap
 
 ## Main Question
 

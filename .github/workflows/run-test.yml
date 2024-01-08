@@ -44,5 +44,7 @@ jobs:
     - name: Run Test
       run: |
         cd main/project
+        ls -l 
+        pwd
         chmod +x tests.sh
         ./tests.sh
