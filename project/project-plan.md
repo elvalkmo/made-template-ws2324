@@ -2,7 +2,7 @@
 
 ## Title
 <!-- Give your project a short title. -->
-Gender Inequality: Relationship between Graduation Field and Wage Gap
+Gender Inequality: Relationship between Graduation Fields and Wage Gap
 
 ## Main Question
 
@@ -16,9 +16,7 @@ Ever since women joined the work forces, gender inequality in terms of wage gap 
 In the old days, due to low literacy rate and physical limitation, participation in less job roles might contribution greatly to inequality in working environment.
 While technology evolves and social norm changes, women are given more chances into different fields. Could this actually close the gender wage gap?
 
-## Datasources
-
-<!-- Describe each datasources you plan to use in a section. Use the prefic "DatasourceX" where X is the id of the datasource. -->
+## Data Sources
 
 ### World Bank: Gender Data Portal
 * Metadata: https://genderdata.worldbank.org/indicators/
@@ -40,5 +38,3 @@ While technology evolves and social norm changes, women are given more chances i
 3. Data Transformation
 4. Visualisation
 5. Document the result
-
-

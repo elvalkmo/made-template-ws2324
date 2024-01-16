@@ -26,23 +26,16 @@ print(wage_gap_df.head())
 print(len(wage_gap_df["LOCATION"].unique()))
 
 #############################################################
-#                   World Bank: zip file
+#             World Bank - Graduation Fields
 #############################################################
 
 response = requests.get(worldbank_zip_url)
 
-# Check if the request was successful (status code 200)
 if response.status_code == 200:
-    # Create a virtual file-like object from the zip file content
     zip_content = BytesIO(response.content)
 
-    # Create a ZipFile object
     with zipfile.ZipFile(zip_content, 'r') as zip_ref:
-        # Assuming you want to read the first file in the zip archive
-        # first_file_name = zip_ref.namelist()[0]
         target_csv_file_name = "Gender_StatsData.csv"
-
-        # Read CSV into Pandas DataFrame
         with zip_ref.open(target_csv_file_name) as file:
             worldbank_df = pd.read_csv(file)
 
@@ -51,7 +44,9 @@ select_indicator_list = worldbank_df[worldbank_df["Indicator Name"].str.contains
 graduate_df = worldbank_df[worldbank_df["Indicator Name"].isin(select_indicator_list)]
 graduate_df = graduate_df.loc[:, ~graduate_df.columns.str.contains('^Unnamed')]
 
-############################ Data Cleaning ########################################
+#############################################################
+#                     Data Cleaning
+#############################################################
 
 graduate_df['Check Empty Row'] = graduate_df.iloc[:, 5:-1].sum(axis=1)
 print(graduate_df['Check Empty Row'])
@@ -60,8 +55,6 @@ graduate_df = graduate_df[graduate_df['Check Empty Row'] != 0]
 graduate_df = graduate_df.drop('Check Empty Row', axis=1)
 print(graduate_df.shape)
 
-
-# Melting with column names
 unpivot_keep_col = graduate_df.columns[0:4]
 unpivot_melt_col = graduate_df.columns[5:-1]
 graduate_df = graduate_df.melt(id_vars=unpivot_keep_col,
@@ -81,14 +74,15 @@ graduate_df["Year"] = graduate_df["Year"].astype(int)
 print(graduate_df.head())
 print(graduate_df.info())
 
-# To select common part of country list of both data set
-
 wage_gap_country_list = wage_gap_df["LOCATION"].unique()
 
 graduate_df = graduate_df[graduate_df["Country Code"].isin(wage_gap_country_list)]
 print(len(wage_gap_country_list))
 print(len(graduate_df["Country Code"].unique()))
-################################Save data####################################
+
+#############################################################
+#                  Write Data into SQLite
+#############################################################
 
 db_path = '../data/project.sqlite'
 engine = create_engine(f'sqlite:///{db_path}')
@@ -97,13 +91,11 @@ if save_data_to_sql:
     wage_gap_df.to_sql('wage_gap', engine, index=False, if_exists='replace')
     graduate_df.to_sql('graduate_field', engine, index=False, if_exists='replace')
 
-############################ Data Transformation after Exploration ########################################
+#############################################################
+#         Further transformation after exploration
+#############################################################
 
-# Further transformation after exploration
-
-### Step 1: Data Selection - Wage Gap Dataset
-
-# wage_gap_df.pivot_table(index="LOCATION", columns="TIME", values="WAGE GAP", fill_value=0).head()
+# Step 1: Data Selection - Wage Gap Dataset
 
 selected_wage_gap_df = wage_gap_df[wage_gap_df["TIME"] != 2022]
 latest = selected_wage_gap_df["TIME"].max()
@@ -115,7 +107,7 @@ zero_count_per_row = pivot.apply(lambda row: (row == 0).sum(), axis=1)
 drop_rows =  zero_count_per_row[zero_count_per_row > 3].index
 selected_wage_gap_df = selected_wage_gap_df[~selected_wage_gap_df["LOCATION"].isin(drop_rows)]
 
-### Step 2: Data Selection - Graduation Field Dataset
+# Step 2: Data Selection - Graduation Field Dataset
 
 selected_countries = selected_wage_gap_df["LOCATION"].unique()
 selected_graduate_df = graduate_df[graduate_df["Country Code"].isin(selected_countries)]
@@ -127,7 +119,7 @@ selected_countries = graduate_df_unique_count[graduate_df_unique_count["Year"] >
 selected_wage_gap_df = selected_wage_gap_df[selected_wage_gap_df["LOCATION"].isin(selected_countries)]
 selected_graduate_df = selected_graduate_df[selected_graduate_df["Country Code"].isin(selected_countries)]
 
-### Step 3: Extract Transformation to Facilitate Visualization
+# Step 3: Extract Transformation to Facilitate Visualization
 
 selected_graduate_df["Non-Female Share"] = 100 - selected_graduate_df["Female Share"]
 
@@ -149,8 +141,9 @@ trad_group_fields = early_year_field_distribution.drop("Female Share", axis=1)
 
 grouped_selected_graduate_df = selected_graduate_df.merge(trad_group_fields, on="Graduation Field")
 
-
-################################Save data####################################
+#############################################################
+#                  Write Data into SQLite
+#############################################################
 
 if save_data_to_sql:
     selected_wage_gap_df.to_sql('selected_wage_gap', engine, index=False, if_exists='replace')

@@ -16,4 +16,3 @@ elif graduate_df.shape[0] > 15000:
     print("Invalid : Wage gap dataset from OECD")
 else:
     print("Error: unable to download datasets")
-
