@@ -30,7 +30,5 @@ df["Geraet"] = pd.to_numeric(df["Geraet"], errors='coerce')
 df["Monat"] = pd.to_numeric(df["Monat"], errors='coerce')
 df = df.dropna(subset=["Geraet", "Hersteller", "Model", "Monat"])
 
-db_path = '../data/temperatures.sqlite'
-engine = create_engine(f'sqlite:///{db_path}')
+engine = create_engine(f'sqlite:///temperatures.sqlite')
 df.to_sql('temperatures', engine, index=False, if_exists='replace')
-
