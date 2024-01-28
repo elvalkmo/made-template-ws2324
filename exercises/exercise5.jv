@@ -38,7 +38,7 @@ pipeline DataPipeline {
 	}
 
 	block GTFSDataSelector oftype CellRangeSelector {
-   		select: range A1:G1286;
+   		select: range A1:G*;
  	}
 
 	block GTFSColumnDeleter oftype ColumnDeleter {
@@ -50,7 +50,7 @@ pipeline DataPipeline {
 	block GTFSTableInterpreter oftype TableInterpreter {
 		header: true;
 		columns: [
-			"stop_id" oftype integer,
+			"stop_id" oftype text,
 			"stop_name" oftype GermanText,
 			"stop_lat" oftype GeoCoodinates,
 			"stop_lon" oftype GeoCoodinates,
@@ -63,6 +63,16 @@ pipeline DataPipeline {
 		file: "./gtfs.sqlite";
 	}
 }
+
+valuetype FilteredZone oftype text {
+    constraints: [
+        Zone2001
+    ];
+}
+
+constraint Zone2001 oftype AllowlistConstraint {
+   allowlist: ["2001"];
+ }
 
 valuetype GermanText oftype text {
     constraints: [
@@ -79,14 +89,9 @@ valuetype GeoCoodinates oftype decimal {
     ];
 }
 
-constraint WithinPlusOrMinus90 on decimal:
-    value>=-90 and value<=90;
-
-valuetype FilteredZone oftype integer {
-    constraints: [
-        Zone2001
-    ];
+constraint WithinPlusOrMinus90 oftype RangeConstraint {
+    lowerBound: -90;
+    lowerBoundInclusive: true;
+    upperBound: 90;
+    upperBoundInclusive: true;
 }
-
-constraint Zone2001 on integer:
-    value==2001;
