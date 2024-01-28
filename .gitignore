@@ -5,4 +5,5 @@
 playground
 trainstops.sqlite
 cars.sqlite
+gtfs.sqlite
 2nd_transformation.py

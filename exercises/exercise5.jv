@@ -1,0 +1,92 @@
+// MADE Exercise5
+
+pipeline DataPipeline {
+
+	pipe {
+		from: GTFSExtractor;
+		to: ZipArchiveInterpreter;
+	}
+
+	ZipArchiveInterpreter
+		-> GTFSFilePicker
+		-> GTFSTextFileInterpreter
+		-> GTFSCSVInterpreter
+		-> GTFSDataSelector
+		-> GTFSColumnDeleter
+	   	-> GTFSTableInterpreter
+		-> GTFSLoader;
+
+	block GTFSExtractor oftype HttpExtractor {
+		url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
+	}
+
+	block ZipArchiveInterpreter oftype ArchiveInterpreter {
+		archiveType: "zip";
+	}
+
+	block GTFSFilePicker oftype FilePicker {
+		path: "/stops.txt";
+	}
+
+	block GTFSTextFileInterpreter oftype TextFileInterpreter {
+		encoding: "utf8";
+	}
+
+	block GTFSCSVInterpreter oftype CSVInterpreter {
+    	delimiter: ',';
+		enclosing: '"';
+	}
+
+	block GTFSDataSelector oftype CellRangeSelector {
+   		select: range A1:G1286;
+ 	}
+
+	block GTFSColumnDeleter oftype ColumnDeleter {
+		delete: [
+			column B, column D
+			];
+	}
+	
+	block GTFSTableInterpreter oftype TableInterpreter {
+		header: true;
+		columns: [
+			"stop_id" oftype integer,
+			"stop_name" oftype GermanText,
+			"stop_lat" oftype GeoCoodinates,
+			"stop_lon" oftype GeoCoodinates,
+			"zone_id" oftype FilteredZone
+		];
+	}
+
+	block GTFSLoader oftype SQLiteLoader {
+		table: "stops";
+		file: "./gtfs.sqlite";
+	}
+}
+
+valuetype GermanText oftype text {
+    constraints: [
+        AllTextWithUmlaut
+    ];
+}
+
+constraint AllTextWithUmlaut on text:
+    value matches /[^a-zA-Z0-9äöüÄÖÜß ]/;
+
+valuetype GeoCoodinates oftype decimal {
+    constraints: [
+        WithinPlusOrMinus90
+    ];
+}
+
+constraint WithinPlusOrMinus90 on decimal:
+    value>=-90 and value<=90;
+
+valuetype FilteredZone oftype integer {
+    constraints: [
+        Zone2001
+    ];
+}
+
+constraint Zone2001 on integer:
+    value==2001;
